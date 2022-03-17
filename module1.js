@@ -2,5 +2,6 @@
 //    console.log("I am module1 :>");
 // }
 module.exports = function(){
-   console.log("I am module1 :>");
+   // console.log("I am module1 :>");
+   console.log("module1.js => " + __filename);
 }
