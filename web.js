@@ -29,10 +29,15 @@ var server = http.createServer(function(request,response){
                         response.end();
                         return;
                     } 
-                    response.writeHead(200,{
-                        "Content-Type": mime.getType(pathname),
+                    var headers = {
+                        'Content-Type': mime.getType(pathname),
                         "Etag": hash
-                    })
+                    };
+                    if (headers["Content-Type"].startsWith('image/')) {
+                        delete headers.Etag;
+                        headers["Cache-Control"] = "max-age=3600"; //3600秒 = 60分鐘
+                    }
+                    response.writeHead(200, headers);
                     response.write(html); //可以寫很多個response.write
                     response.end(); //結尾一定要加上response.end
                 }
