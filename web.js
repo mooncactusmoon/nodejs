@@ -5,10 +5,21 @@ var http = require('http');
 var server = http.createServer(function(request,response){
     var pathname= url.parse(request.url).pathname; //網址不取到get參數
     // console.log(pathname);
-    fs.stat('.' + pathname, function(err,stats){
+    if(pathname.endsWith('/')){ //如果結尾是斜線，就加上index.html
+        pathname += 'index.html';
+    }
+    var relativePathname = decodeURIComponent(pathname); //這樣就可以用中文命名資料夾了
+    fs.stat('.' +relativePathname, function(err,stats){
+        if(!err && stats.isDirectory()){ //判斷是否為資料夾
+            response.writeHead(302,{//轉址
+                'Location': pathname + "/" + (url.parse(request.url).search || "")
+            })
+            response.end();
+            return;
+        }
         if(!err && stats.isFile()){
             //err空的且stats是個檔案
-            fs.readFile("./index.html",function(err,html){
+            fs.readFile('.' +relativePathname,function(err,html){
                 if(!err){ //err是空的，代表沒有錯誤
                     response.writeHead(200,{
                         "Content-Type": mime.getType(pathname)
